@@ -15,7 +15,7 @@ func (n *Nuwa) Work(s Stone, args ...interface{}) {
 }
 
 // 天漏了，创建一个女娲准备补天了
-func New(n *Nuwa) {
+func New()(n *Nuwa) {
 	n = &Nuwa{
 		Logger: log.New("nuwa"),
 	}
