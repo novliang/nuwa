@@ -12,6 +12,10 @@ import (
 	"strings"
 )
 
+const (
+	HeaderOauthServer = "NUWA-OAUTH-SERVER"
+)
+
 // 金子是一个Web服务框架
 type Gold struct {
 	*echo.Echo
@@ -29,6 +33,7 @@ type Response struct {
 type GoldConfig struct {
 	HttpErrorHandler func(error, echo.Context)
 	Routers          func(*Gold)
+	OauthClients     []*OauthClient
 }
 
 // 加载配置文件
@@ -97,7 +102,7 @@ func NewGoldWithConfig(config GoldConfig) *Gold {
 	// set CORS
 	g.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, HeaderOauthServer},
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.OPTIONS},
 	}))
 
@@ -111,6 +116,11 @@ func NewGoldWithConfig(config GoldConfig) *Gold {
 			return handlerFunc(think)
 		}
 	})
+
+	// Oauth
+	if len(config.OauthClients) != 0 {
+		Oauth(g, config.OauthClients)
+	}
 
 	//Use gzip with level 5
 	g.Use(middleware.GzipWithConfig(middleware.GzipConfig{
