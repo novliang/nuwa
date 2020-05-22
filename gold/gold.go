@@ -127,6 +127,11 @@ func NewGoldWithConfig(config GoldConfig) *Gold {
 		Level: 5,
 	}))
 
+	// injection routers
+	if config.Routers != nil {
+		config.Routers(g)
+	}
+
 	//For HA Health Check
 	g.GET("/ping", func(c echo.Context) error {
 		return c.JSON(200, "pong")
